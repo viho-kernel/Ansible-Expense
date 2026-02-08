@@ -73,25 +73,31 @@
     ansible.builtin.dnf: 
         name: python3-PyMySQL 
         state: present  
-  
-  - name: Installing Mysql Server
-    ansible.builtin.dnf:
-       name: mysql
+
+  - name: Install MySQL client 
+    ansible.builtin.dnf: 
+       name: mysql 
        state: present
+
+  - name: Ensure MySQL service is running 
+    ansible.builtin.service: 
+      name: mysqld 
+      state: started 
+      enabled: yes
 
   - name: Ensure backend database exists 
     community.mysql.mysql_db: 
       name: backend 
       state: present 
       login_user: root 
-      login_password: "ExpenseApp@1"
-
-  - name: Loading Schema
-    community.mysql.mysql_user:
-      name: backed
-      state: import
-      target: /app/schema/backend.sql1
-      login_user: root
+      login_password: "ExpenseApp@1" 
+  
+  - name: Load backend schema 
+    community.mysql.mysql_db: 
+      name: backend 
+      state: import 
+      target: /app/schema/backend.sql 
+      login_user: root 
       login_password: "ExpenseApp@1"
     
   - name: Restart Backend service
