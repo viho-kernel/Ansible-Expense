@@ -21,3 +21,10 @@
     - name: set MySQL root password
       ansible.builtin.shell: |
         mysql_secure_installation --set-root-pass ExpenseApp@1
+      args:
+        creates: /var/lib/mysql/.password_set
+    
+    - name: Create password marker
+      ansible.builtin.file: |
+        path: /var/lib/mysql/.password_set
+        state: touch
