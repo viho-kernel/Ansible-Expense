@@ -32,7 +32,7 @@
       name: expense
       shell: /sbin/nologin
 
-  - name: Create app Director
+  - name: Create app Directory
     ansible.builtin.file:
       path: /app
       state: directory
