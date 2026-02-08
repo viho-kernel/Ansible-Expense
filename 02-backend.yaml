@@ -43,9 +43,6 @@
     ansible.builtin.get_url:
       url: "https://expense-joindevops.s3.us-east-1.amazonaws.com/expense-backend-v2.zip"
       dest: "/tmp/backend.zip"
-  
-  - name: Change app directory
-    ansible.builtin.command: cd app
 
   - name: Extract a code
     ansible.builtin.unarchive:
@@ -57,6 +54,8 @@
   
   - name: Installing dependencies
     ansible.builtin.command: npm install
+    args:
+      chdir: /app
       
   - name: Copy Backend service file
     ansible.builtin.copy:
