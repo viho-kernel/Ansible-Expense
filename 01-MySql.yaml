@@ -4,7 +4,7 @@
   connection: local
   tasks:
   - name: Installing Mysql Server
-    ansible.builtin.apt:
+    ansible.builtin.dnf:
        name: Mysql-server
        state: present
     
