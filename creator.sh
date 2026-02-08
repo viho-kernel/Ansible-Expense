@@ -16,7 +16,7 @@ do
     --output text
    )
 
-   if [ -n $EXISTING_ID ];then
+   if [ ! -n $EXISTING_ID ];then
      echo " ${instance} Instance is already present. Hence, skipping creation..!"
    else
       INSTANCE_ID=$(
