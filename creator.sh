@@ -41,6 +41,7 @@ do
         --output text
     )
     RECORD_NAME=${HOSTED_ZONE}
+    echo " IP Address of the instance ${instance} is : ${IP} "
     else
     IP=$(
         aws ec2 describe-instances \
