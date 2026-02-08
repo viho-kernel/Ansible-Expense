@@ -16,23 +16,22 @@ do
     --output text
    )
 
-   if [ -n "$EXISTING_ID" ];then
-     echo " ${instance} Instance is already present. Hence, skipping creation..!"
-   else
-      INSTANCE_ID=$(
-    aws ec2 run-instances \
-    --image-id $AMI_ID \
+   if [ -n "$EXISTING_ID" ]; then
+  echo "${instance} Instance is already present. Hence, skipping creation..!"
+  INSTANCE_ID=$EXISTING_ID
+else
+  INSTANCE_ID=$(aws ec2 run-instances \
+    --image-id "$AMI_ID" \
     --instance-type t3.micro \
-    --security-group-ids $SG_ID \
+    --security-group-ids "$SG_ID" \
     --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$instance}]" \
     --query 'Instances[0].InstanceId' \
-    --output text
-    )
+    --output text)
+  echo "Instance created ${INSTANCE_ID}"
+fi
 
-    echo "Instance created ${INSTANCE_ID}"
-    fi 
 
-    if [ $instance == "frontend" ];then
+    if [ "$instance" == "frontend" ]; then
 
     IP=$(
         aws ec2 describe-instances \
@@ -56,27 +55,25 @@ do
     fi
     
 
-    aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch '
+    aws route53 change-resource-record-sets --hosted-zone-id "$ZONE_ID" --change-batch "
     {
-  "Comment": "Updating A record",
-  "Changes": [
+  \"Comment\": \"Updating A record\",
+  \"Changes\": [
     {
-      "Action": "UPSERT",
-      "ResourceRecordSet": {
-        "Name": "${RECORD_NAME}",
-        "Type": "A",
-        "TTL": 1,
-        "ResourceRecords": [
-          {
-            "Value": "${IP}"
-          }
+      \"Action\": \"UPSERT\",
+      \"ResourceRecordSet\": {
+        \"Name\": \"${RECORD_NAME}\",
+        \"Type\": \"A\",
+        \"TTL\": 1,
+        \"ResourceRecords\": [
+          { \"Value\": \"${IP}\" }
         ]
       }
     }
   ]
 }
+"
 
-'
  echo "DNS record updated: ${RECORD_NAME} → ${IP}"
 
 done
