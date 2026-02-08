@@ -8,23 +8,26 @@
         name: mysql-server
         state: present
 
-    - name: Enable MySql Service
+    - name: Enable MySQL service
       ansible.builtin.systemd:
-       name: mysqld
-       enabled: yes
+        name: mysqld
+        enabled: yes
 
     - name: Start MySQL service
       ansible.builtin.systemd:
         name: mysqld
-        enabled: yes
-    
-    - name: set MySQL root password
+        state: started
+
+    - name: Set MySQL root password
       ansible.builtin.shell: |
         mysql_secure_installation --set-root-pass ExpenseApp@1
       args:
-        creates: /var/lib/mysql/.password_set
-    
-    - name: Create password marker
-      ansible.builtin.file: |
-        path: /var/lib/mysql/.password_set
+        creates: /root/.mysql_configured
+      register: mysql_password_set
+      ignore_errors: yes
+
+    - name: Create marker file to prevent re-running password setup
+      ansible.builtin.file:
+        path: /root/.mysql_configured
         state: touch
+      when: mysql_password_set is succeeded
