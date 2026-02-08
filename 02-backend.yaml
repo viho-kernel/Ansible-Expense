@@ -1,19 +1,12 @@
-- name: backend Setup
+- name: Backend Setup
   hosts: backend
   become: yes
-  connection: local
   tasks:
-  - name: Disabling NodeJs
-    ansible.builtin.dnf:
-      name: nodejs
-      state: stopped
-      enabled: no
+  - name: Disabling Default NodeJs module
+    ansible.builtin.command: dnf module disable nodejs -y
   
   - name: Enable NodeJs
-    ansible.builtin.dnf:
-      name: nodejs:20
-      state: started
-      enabled: yes
+    ansible.builtin.command: dnf module enable nodejs:20 -y
     
   - name: Enable NodeJs
     ansible.builtin.dnf:
@@ -21,16 +14,24 @@
       state: present
   
   - name: Update openssl packages too not break SSH login
-    ansible.builtin.command: dnf update -y openssh openssh-server openssh-clients
+    ansible.builtin.dnf:
+      name:
+        - openssh
+        - openssh-server
+        - openssh-clients
+      state: latest
 
   - name: Creating expense user
     ansible.builtin.user:
       name: expense
+      shell: /sbin/nologin
 
   - name: Create an app Director
     ansible.builtin.file:
-      path: /home/ec2-user/app
+      path: /app
       state: directory
+      owner: expense
+      group: expense
   
   - name: Download the application code
     ansible.builtin.get_url:
@@ -43,9 +44,45 @@
   - name: Extract a code
     ansible.builtin.unarchive:
       src: "/tmp/backend.zip"
-      dest: /home/ec2-user/app
+      dest: /app
+      remote_src: yes
+      owner: expense
+      group: expense
   
   - name: Installing dependencies
-    nsible.builtin.command: npm install
+    ansible.builtin.command: npm install
       
-      
+  - name: Copy Backend service files
+    ansible.builtin.copy:
+      src: /home/ec2-user/Ansible-Expense/backend.service
+      dest: /etc/systemd/system/backend.service
+
+  - name: System reload daemon and start backend service
+    ansible.builtin.systemd_service:
+        name: backend
+        daemon_reload: true
+        state: started
+        enabled: yes  
+
+  - name: Ensure Python MySQL dependencies are installed 
+    ansible.builtin.dnf: 
+        name: python3-PyMySQL 
+        state: present  
+  
+  - name: Installing Mysql Server
+    ansible.builtin.dnf:
+       name: mysql
+       state: present
+
+  - name: Loading Schema
+    community.mysql.mysql_user:
+      name: backed
+      state: import
+      target: /app/schema/backend.sql1
+      login_user: root
+      login_password: "ExpenseApp@1"
+    
+  - name: Restart Backend service
+    ansible.builtin.systemd_service:
+        name: backend
+        state: restarted 
