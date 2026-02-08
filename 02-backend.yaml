@@ -11,15 +11,15 @@
   - name: Disabling Default NodeJs module
     ansible.builtin.command: dnf module disable nodejs -y
   
-  - name: Enable NodeJs
+  - name: Enable NodeJs 20 module
     ansible.builtin.command: dnf module enable nodejs:20 -y
     
-  - name: Enable NodeJs
+  - name: Install NodeJs
     ansible.builtin.dnf:
       name: nodejs
       state: present
   
-  - name: Update openssl packages too not break SSH login
+  - name: Update openssl packages
     ansible.builtin.dnf:
       name:
         - openssh
@@ -32,14 +32,14 @@
       name: expense
       shell: /sbin/nologin
 
-  - name: Create an app Director
+  - name: Create app Director
     ansible.builtin.file:
       path: /app
       state: directory
       owner: expense
       group: expense
   
-  - name: Download the application code
+  - name: Download backend code
     ansible.builtin.get_url:
       url: "https://expense-joindevops.s3.us-east-1.amazonaws.com/expense-backend-v2.zip"
       dest: "/tmp/backend.zip"
@@ -52,7 +52,7 @@
       owner: expense
       group: expense
   
-  - name: Installing dependencies
+  - name: Installing npm dependencies
     ansible.builtin.command: npm install
     args:
       chdir: /app
@@ -62,43 +62,22 @@
       src: /home/ec2-user/Ansible-Expense/backend.service
       dest: /etc/systemd/system/backend.service
 
-  - name: System reload daemon and start backend service
+  - name: Reload systemd and start backend service
     ansible.builtin.systemd_service:
         name: backend
-        daemon_reload: true
+        daemon_reload: yes
         state: started
         enabled: yes  
-
-  - name: Ensure Python MySQL dependencies are installed 
-    ansible.builtin.dnf: 
-        name: python3-PyMySQL 
-        state: present  
 
   - name: Install MySQL client 
     ansible.builtin.dnf: 
        name: mysql 
        state: present
 
-  - name: Ensure MySQL service is running 
-    ansible.builtin.service: 
-      name: mysqld 
-      state: started 
-      enabled: yes
-
-  - name: Ensure backend database exists 
-    community.mysql.mysql_db: 
-      name: backend 
-      state: present 
-      login_user: root 
-      login_password: "ExpenseApp@1" 
-  
-  - name: Load backend schema 
-    community.mysql.mysql_db: 
-      name: backend 
-      state: import 
-      target: /app/schema/backend.sql 
-      login_user: root 
-      login_password: "ExpenseApp@1"
+  - name: Load backend schema into remote MySQL
+    ansible.builtin.command: >
+        mysql -h {{ hostvars['mysql.opsora.space'].ansible_host | default('mysql.opsora.space') }}
+        -u root -pExpenseApp@1 < /app/schema/backend.sql
     
   - name: Restart Backend service
     ansible.builtin.systemd_service:
