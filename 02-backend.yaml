@@ -82,7 +82,7 @@
   - name: Loading Schema
     community.mysql.mysql_user:
       name: backed
-      state: present
+      state: import
       target: /app/schema/backend.sql1
       login_user: root
       login_password: "ExpenseApp@1"
