@@ -2,6 +2,12 @@
   hosts: backend
   become: yes
   tasks:
+  - name: Clone Ansible-Expense repo 
+    ansible.builtin.git: 
+      repo: "https://github.com/viho-kernel/Ansible-Expense.git" 
+      dest: /home/ec2-user/Ansible-Expense 
+      version: main
+
   - name: Disabling Default NodeJs module
     ansible.builtin.command: dnf module disable nodejs -y
   
@@ -52,7 +58,7 @@
   - name: Installing dependencies
     ansible.builtin.command: npm install
       
-  - name: Copy Backend service files
+  - name: Copy Backend service file
     ansible.builtin.copy:
       src: /home/ec2-user/Ansible-Expense/backend.service
       dest: /etc/systemd/system/backend.service
