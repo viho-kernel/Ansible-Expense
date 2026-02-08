@@ -51,11 +51,11 @@ do
     RECORD_NAME=${instance}.${HOSTED_ZONE}
 
     echo " IP Address of the instance ${instance} is : ${IP} "
-    
+
     fi
     
 
-    aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch '
+    aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch '
     {
   "Comment": "Updating A record",
   "Changes": [
