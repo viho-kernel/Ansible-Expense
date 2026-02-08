@@ -79,6 +79,13 @@
        name: mysql
        state: present
 
+  - name: Ensure backend database exists 
+    community.mysql.mysql_db: 
+      name: backend 
+      state: present 
+      login_user: root 
+      login_password: "ExpenseApp@1"
+
   - name: Loading Schema
     community.mysql.mysql_user:
       name: backed
