@@ -1,0 +1,51 @@
+- name: backend Setup
+  hosts: backend
+  become: yes
+  connection: local
+  tasks:
+  - name: Disabling NodeJs
+    ansible.builtin.dnf:
+      name: nodejs
+      state: stopped
+      enabled: no
+  
+  - name: Enable NodeJs
+    ansible.builtin.dnf:
+      name: nodejs:20
+      state: started
+      enabled: yes
+    
+  - name: Enable NodeJs
+    ansible.builtin.dnf:
+      name: nodejs
+      state: present
+  
+  - name: Update openssl packages too not break SSH login
+    ansible.builtin.command: dnf update -y openssh openssh-server openssh-clients
+
+  - name: Creating expense user
+    ansible.builtin.user:
+      name: expense
+
+  - name: Create an app Director
+    ansible.builtin.file:
+      path: /home/ec2-user/app
+      state: directory
+  
+  - name: Download the application code
+    ansible.builtin.get_url:
+      url: "https://expense-joindevops.s3.us-east-1.amazonaws.com/expense-backend-v2.zip"
+      dest: "/tmp/backend.zip"
+  
+  - name: Change app directory
+    ansible.builtin.command: cd app
+
+  - name: Extract a code
+    ansible.builtin.unarchive:
+      src: "/tmp/backend.zip"
+      dest: /home/ec2-user/app
+  
+  - name: Installing dependencies
+    nsible.builtin.command: npm install
+      
+      
