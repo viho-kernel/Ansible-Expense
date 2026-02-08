@@ -52,20 +52,21 @@ do
     echo "Instance ${INSTANCE_ID} ip is ${IP}."
     RECORD_NAME=${instance}.${HOSTED_ZONE}
     fi
+    echo -e " IP Address of the instance ${instance} is : ${IP} "
 
-    aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch "
+    aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch '
     {
-  "Comment": "Upsert A record for ${instance}",
+  "Comment": "Updating A record",
   "Changes": [
     {
       "Action": "UPSERT",
       "ResourceRecordSet": {
-        "Name": "${RECORD_NAME}",
+        "Name": "'"$RECORD_NAME"'",
         "Type": "A",
         "TTL": 1,
         "ResourceRecords": [
           {
-            "Value": "${IP}"
+            "Value": "'$IP'"
           }
         ]
       }
@@ -73,8 +74,9 @@ do
   ]
 }
 
-
-"
+'
+ echo "DNS record updated: ${RECORD_NAME} → ${IP}"
+ echo -e "$M ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$N"
 
 
 done
