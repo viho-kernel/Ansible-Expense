@@ -48,12 +48,12 @@ do
         --query 'Reservations[*].Instances[*].PrivateIpAddress' \
         --output text
     )
-    echo "Instance ${INSTANCE_ID} ip is ${IP}."
-
     RECORD_NAME=${instance}.${HOSTED_ZONE}
 
-    fi
     echo " IP Address of the instance ${instance} is : ${IP} "
+    
+    fi
+    
 
     aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch '
     {
