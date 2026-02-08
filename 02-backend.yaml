@@ -1,25 +1,28 @@
 - name: Backend Setup
   hosts: backend
   become: yes
-  tasks:
-  - name: Clone Ansible-Expense repo 
-    ansible.builtin.git: 
-      repo: "https://github.com/viho-kernel/Ansible-Expense.git" 
-      dest: /home/ec2-user/Ansible-Expense 
-      version: main
 
-  - name: Disabling Default NodeJs module
-    ansible.builtin.command: dnf module disable nodejs -y
-  
-  - name: Enable NodeJs 20 module
-    ansible.builtin.command: dnf module enable nodejs:20 -y
-    
-  - name: Install NodeJs
+  vars:
+    mysql_host: mysql.opsora.space
+
+  tasks:
+
+  - name: Disable default NodeJS module
+    ansible.builtin.shell: dnf module disable nodejs -y
+    args:
+      warn: false
+
+  - name: Enable NodeJS 20 module
+    ansible.builtin.shell: dnf module enable nodejs:20 -y
+    args:
+      warn: false
+
+  - name: Install NodeJS
     ansible.builtin.dnf:
       name: nodejs
       state: present
-  
-  - name: Update openssl packages
+
+  - name: Update OpenSSH packages
     ansible.builtin.dnf:
       name:
         - openssh
@@ -27,59 +30,54 @@
         - openssh-clients
       state: latest
 
-  - name: Creating expense user
+  - name: Create expense user
     ansible.builtin.user:
       name: expense
       shell: /sbin/nologin
 
-  - name: Create app Directory
+  - name: Create app directory
     ansible.builtin.file:
       path: /app
       state: directory
       owner: expense
       group: expense
-  
+
   - name: Download backend code
     ansible.builtin.get_url:
-      url: "https://expense-joindevops.s3.us-east-1.amazonaws.com/expense-backend-v2.zip"
-      dest: "/tmp/backend.zip"
+      url: https://expense-joindevops.s3.us-east-1.amazonaws.com/expense-backend-v2.zip
+      dest: /tmp/backend.zip
 
-  - name: Extract a code
+  - name: Extract backend code
     ansible.builtin.unarchive:
-      src: "/tmp/backend.zip"
+      src: /tmp/backend.zip
       dest: /app
       remote_src: yes
       owner: expense
       group: expense
-  
-  - name: Installing npm dependencies
+
+  - name: Install npm dependencies (as expense user)
     ansible.builtin.command: npm install
     args:
       chdir: /app
-      
-  - name: Copy Backend service file
-    ansible.builtin.copy:
-      src: /home/ec2-user/Ansible-Expense/backend.service
+    become_user: expense
+
+  - name: Copy backend systemd service
+    ansible.builtin.template:
+      src: backend.service.j2
       dest: /etc/systemd/system/backend.service
 
-  - name: Reload systemd and start backend service
-    ansible.builtin.systemd_service:
-        name: backend
-        daemon_reload: yes
-        state: started
-        enabled: yes  
+  - name: Install MySQL client
+    ansible.builtin.dnf:
+      name: mysql
+      state: present
 
-  - name: Install MySQL client 
-    ansible.builtin.dnf: 
-       name: mysql 
-       state: present
+  - name: Load backend schema
+    ansible.builtin.shell: |
+      mysql -h {{ mysql_host }} -u root -pExpenseApp@1 < /app/schema/backend.sql
 
-  - name: Load backend schema into remote MySQL
-    ansible.builtin.command: >
-        mysql -h {{ hostvars['mysql.opsora.space'].ansible_host | default('mysql.opsora.space') }}
-        -u root -pExpenseApp@1 < /app/schema/backend.sql
-    
-  - name: Restart Backend service
-    ansible.builtin.systemd_service:
-        name: backend
-        state: restarted 
+  - name: Reload and start backend service
+    ansible.builtin.systemd:
+      name: backend
+      daemon_reload: yes
+      state: started
+      enabled: yes
