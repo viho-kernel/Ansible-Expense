@@ -16,7 +16,7 @@ do
     --output text
    )
 
-   if [ ! -n $EXISTING_ID ];then
+   if [ -n "$EXISTING_ID" ];then
      echo " ${instance} Instance is already present. Hence, skipping creation..!"
    else
       INSTANCE_ID=$(
@@ -24,7 +24,7 @@ do
     --image-id $AMI_ID \
     --instance-type t3.micro \
     --security-group-ids $SG_ID \
-    --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=$instance}]' \
+    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$instance}]" \
     --query 'Instances[0].InstanceId' \
     --output text
     )
@@ -53,7 +53,7 @@ do
     RECORD_NAME=${instance}.${HOSTED_ZONE}
     fi
 
-    aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch '
+    aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch "
     {
   "Comment": "Upsert A record for ${instance}",
   "Changes": [
@@ -74,7 +74,7 @@ do
 }
 
 
-    '
+"
 
 
 done
