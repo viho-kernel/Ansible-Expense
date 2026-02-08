@@ -13,3 +13,12 @@
        name: mysqld
        state: started
        enabled: yes
+
+  - name: Set MySQL root password
+    community.mysql.mysql_user:
+      name: root
+      host: mysql
+      password: "ExpenseApp@1"
+      state: present
+
+    
