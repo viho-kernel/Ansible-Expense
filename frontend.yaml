@@ -30,6 +30,12 @@
         src: /tmp/frontend.zip
         dest: /usr/share/nginx/html
         remote_src: yes
+    
+    - name: Remove old default.d expense config if exists
+      ansible.builtin.file:
+        path: /etc/nginx/default.d/expense.conf
+        state: absent
+
 
     - name: Copy nginx reverse proxy config
       ansible.builtin.template:
