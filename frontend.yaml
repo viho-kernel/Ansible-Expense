@@ -21,6 +21,9 @@
       ansible.builtin.get_url:
         url: https://expense-joindevops.s3.us-east-1.amazonaws.com/expense-frontend-v2.zip
         dest: /tmp/frontend.zip
+    
+    - name: move to code
+      ansible.builtin.command: cd /usr/share/nginx/html
 
     - name: Unzip frontend code
       ansible.builtin.unarchive:
