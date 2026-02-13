@@ -33,9 +33,9 @@
       record: "{{ item.item }}-{{ enviro }}.{{ domain_name }}" 
       type: A
       ttl: 1
-      value: "{{ item.instances[0].private_ip-address }} "
+      value: "{{ item.instances[0].private_ip_address }}"
       wait: true
-    loop: "{{ ec2_output.instances }}"
+    loop: "{{ ec2_output.results }}"
     when: action == "create"
 
   - name: creating route 53 records
