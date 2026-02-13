@@ -21,7 +21,7 @@
     ansible.builtin.file:
       path: /usr/share/nginx/html
       state: absent
-      
+
   - name: Recreate nginx html directory
     ansible.builtin.file:
       path: /usr/share/nginx/html
@@ -44,9 +44,12 @@
     ansible.builtin.copy:
       src: frontend.conf
       dest: /etc/nginx/default.d/expense.conf
+      owner: root 
+      group: root
+      mode: '0644'
     
   - name: Restart nginx service
-    ansible.builtin.systemd_service:
+    ansible.builtin.service:
       name: nginx
       state: restarted
   
