@@ -18,7 +18,7 @@
 
   - name: start mysql service
     ansible.builtin.service:
-      named: mysqld
+      name: mysqld
       state: started
 
   - name: setting up root password
