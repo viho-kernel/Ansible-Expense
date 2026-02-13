@@ -37,12 +37,12 @@
       wait: true
     loop: "{{ ec2_output.results }}"
     when: action == "create"
-
-  - name: creating route 53 records
+  
+  - name: create router 53 records
     amazon.aws.route53:
       state: present
       zone: "{{ domain_name }}"
-      record: "expense-{{ enviro }}.{{ domain_name }}" 
+      record: "expense-{{ enviro }}.{{ domain_name }}" #expense-dev.opsora.space
       type: A
       ttl: 1
       value: "{{ item.instances[0].public_ip_address }}"
