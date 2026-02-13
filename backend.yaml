@@ -54,7 +54,7 @@
   - name: Copy the backend service files
     ansible.builtin.copy:
       src: backend.service
-      dest: /app
+      dest: /etc/systemd/system/backend.service
 
   - name: Reload systemd 
     ansible.builtin.systemd: 
