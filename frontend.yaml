@@ -1,31 +1,23 @@
-- name: Setting up frontend
+- name: Setup Frontend
   hosts: frontend
   become: yes
+
   tasks:
+
     - name: Install nginx
       ansible.builtin.dnf:
         name: nginx
         state: present
 
-    - name: Enable nginx
-      ansible.builtin.service:
-        name: nginx
-        enabled: yes
+    - name: Clean old nginx config (if exists)
+      ansible.builtin.file:
+        path: /etc/nginx/conf.d/expense.conf
+        state: absent
 
-    - name: Start nginx
-      ansible.builtin.service:
-        name: nginx
-        state: started
-
-    - name: Remove default nginx content
+    - name: Clean default nginx content
       ansible.builtin.shell: rm -rf /usr/share/nginx/html/*
 
-    - name: Recreate nginx html directory
-      ansible.builtin.file:
-        path: /usr/share/nginx/html
-        state: directory
-
-    - name: Download application code
+    - name: Download frontend code
       ansible.builtin.get_url:
         url: https://expense-joindevops.s3.us-east-1.amazonaws.com/expense-frontend-v2.zip
         dest: /tmp/frontend.zip
@@ -36,13 +28,13 @@
         dest: /usr/share/nginx/html
         remote_src: yes
 
-    - name: Copy frontend config
+    - name: Copy nginx reverse proxy config
       ansible.builtin.template:
         src: frontend.conf
         dest: /etc/nginx/conf.d/expense.conf
 
-
-    - name: Reload nginx service
+    - name: Restart nginx
       ansible.builtin.service:
         name: nginx
-        state: reloaded
+        state: restarted
+        enabled: yes
