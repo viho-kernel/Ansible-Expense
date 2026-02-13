@@ -56,13 +56,13 @@
       src: backend.service
       dest: /app
 
-  - name: System reload
-    ansible.builtin.systemd:
-      daemon_reload: yes
+  - name: Reload systemd 
+    ansible.builtin.systemd: 
+      daemon_reload: yes 
   
-  - name: start backend service
-    ansible.builtin.service:
-      name: backend
+  - name: Ensure backend service is running 
+    ansible.builtin.service: 
+      name: backend 
       state: started 
       enabled: yes
   
