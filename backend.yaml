@@ -70,27 +70,9 @@
     ansible.builtin.dnf:
       name: mysql
       state: present
-  
-  - name: Ensure PyMySQL is installed
-    ansible.builtin.dnf:
-      name: python3-PyMySQL
-      state: present
 
-  - name: Check if schema exists
-    community.mysql.mysql_info:
-      login_host: "{{ MYSQL_HOST }}"
-      login_user: root
-      login_password: ExpenseApp@1
-      filter: databases
-    register: schema_status
-  
-  - name: print the output
-    ansible.builtin.debug:
-      msg: "{{ schema_status }}"
-  
   - name: Load schema database
     ansible.builtin.command: mysql -h "{{ MYSQL_HOST }}" -uroot -pExpenseApp@1 < /app/schema/backend.sql
-    when: not schema_status.failed
 
   - name: restart backend service
     ansible.builtin.service:
