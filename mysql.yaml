@@ -14,6 +14,6 @@
     ansible.builtin.command: systemctl start mysqld
 
   - name: setting up root password
-    ansible.builtin.shell: mysql_secure_installation --set-root-pass "{{ password }}"
+    ansible.builtin.shell: mysql_secure_installation --set-root-pass ExpenseApp@1
 
   
