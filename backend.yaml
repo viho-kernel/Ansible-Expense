@@ -58,7 +58,7 @@
 
   - name: System reload
     ansible.builtin.systemd:
-      daemon_reload: ues
+      daemon_reload: yes
   
   - name: start backend service
     ansible.builtin.service:
