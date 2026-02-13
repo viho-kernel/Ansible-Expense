@@ -1,0 +1,95 @@
+- name: setting up backend.
+  hosts: backend
+  become: yes
+  tasks:
+  - name: Disabled Default Nodejs
+    ansible.builtin.command: dnf module disable nodejs -y
+  
+  - name: enable nodejs:20 
+    ansible.builtin.command: dnf module enable nodejs:20 -y
+
+  - name: install nodejs
+    ansible.builtin.dnf:
+      name: nodejs
+      state: present
+  
+  - name: Updating openssl packages
+    ansible.builtin.dnf: 
+      name: 
+        - openssh 
+        - openssh-server 
+        - openssh-clients
+      state: latest
+  
+  - name: Adding application user
+    ansible.builtin.user:
+      name: expense
+  
+  - name: Remove directory
+    ansible.builtin.file:
+      path: /app
+      state: absent
+
+  - name: Create app directory
+    ansible.builtin.file:
+      path: /app
+      state: directory
+  
+  - name: Download application code
+    ansible.builtin.get_url:
+      url: https://expense-joindevops.s3.us-east-1.amazonaws.com/expense-backend-v2.zip
+      dest: /tmp/backend.zip
+
+  - name: Unzipping the code
+    ansible.builtin.unarchive:
+      src: /tmp/backend.zip
+      dest: /app
+
+  - name: Installing Dependencies
+    community.general.npm:
+      path: /app
+      state: present 
+  
+  - name: Copy the backend service files
+    ansible.builtin.copy:
+      src: backend.service
+      dest: /app
+
+  - name: System reload
+    ansible.builtin.systemd:
+      daemon_reload: ues
+  
+  - name: start backend service
+    ansible.builtin.service:
+      name: backend
+      state: started
+      enabled: yes
+  
+  - name: install mysql client 
+    ansible.builtin.dnf:
+      name: mysql
+      state: present
+
+  - name: Check if schema exists
+    community.mysql.mysql_db:
+      name: "{{ mysql }}"
+      state: present
+      login_host: "{{ MYSQL_HOST }}"
+      login_user: root
+      login_password: ExpenseApp@1
+    register: schema_status
+  
+  - name: print the output
+    ansible.builtin.debug:
+      msg: "{{ schema_status }}"
+  
+  # - name: Load schema database
+  #   ansible.builtin.command: mysql -h "{{ MYSQL_HOST }}" -uroot -pExpenseApp@1 < /app/schema/backend.sql
+  #   when: schema_status.stdout.rc | int < 0
+
+  - name: restart backend service
+    ansible.builtin.service:
+      name: backend
+      state: restarted
+      enabled: yes
+      
