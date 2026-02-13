@@ -16,7 +16,7 @@
       security_group: "{{ sg_id }}"
       count: 1
       wait: true
-      name: "{{ item }}-{{ enviro }}.{domain_name}"
+      name: "{{ item }}-{{ enviro }}"
       tags:
          project: expense
          component: "{{ item }}"
@@ -30,8 +30,52 @@
     ansible.builtin.debug:
       msg: "{{ ec2_output }}"
     when: action == "create"
-    
-    
-        
-      
   
+  - name: creating route 53 records
+    amazon.aws.route53:
+      state: present
+      zone: "{{ domain_name }}"
+      record: "{{ item.item }}-{{ enviro }}.{{ domain_name }}" 
+      type: A
+      ttl: 1
+      value: "{{ item.instances[0].private_ip-address }} "
+      wait: true
+    loop: "{{ ec2_output.instances }}"
+    when: action == "create"
+
+  - name: creating route 53 records
+    amazon.aws.route53:
+      state: present
+      zone: "{{ domain_name }}"
+      record: "expense-{{ enviro }}.{{ domain_name }}" 
+      type: A
+      ttl: 1
+      value: "{{ item.instances[0].public_ip_address }}"
+      wait: true
+    loop: "{{ ec2_output.instances }}"
+    when: 
+    - action == "create"
+    - item.item = "frontend"
+
+  - name: Delete route 53 records
+    amazon.aws.route53:
+      state: absent
+      zone: "{{ domain_name }}"
+      record: "{{ item.item }}-{{ enviro }}.{{ domain_name }}"
+      type: A
+      ttl: 1
+    loop: "{{ ec2_output.instances }}"
+    when: 
+    - action == "destroy"
+
+  - name: Delete ec2 instances
+    amazon.aws.ec2_instance:
+      state: absent
+      wait: true
+      name: "{{ item }-{{ enviro }}"
+    
+    loop: "{{ instances }}"
+    when:
+    - action == "destroy"
+
+   
