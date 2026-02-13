@@ -70,6 +70,11 @@
     ansible.builtin.dnf:
       name: mysql
       state: present
+  
+  - name: Ensure PyMySQL is installed
+    ansible.builtin.dnf:
+      name: python3-PyMySQL
+      state: present
 
   - name: Check if schema exists
     community.mysql.mysql_info:
