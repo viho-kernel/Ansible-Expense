@@ -56,25 +56,27 @@
     - action == "create"
     
 
-  - name: Delete route 53 records
+  - name: Delete route53 records
     amazon.aws.route53:
       state: absent
       zone: "{{ domain_name }}"
-      record: "{{ item.item }}-{{ enviro }}.{{ domain_name }}"
+      record: "{{ item }}-{{ enviro }}.{{ domain_name }}"
       type: A
-      ttl: 1
-    loop: "{{ ec2_output.results }}"
-    when: 
-    - action == "destroy"
+    loop: "{{ instances }}"
+    when: action == "destroy"
 
-  - name: Delete ec2 instances
+  - name: Delete expense public record
+    amazon.aws.route53:
+      state: absent
+      zone: "{{ domain_name }}"
+      record: "expense-{{ enviro }}.{{ domain_name }}"
+      type: A
+    when: action == "destroy"
+
+  - name: Delete EC2 instances
     amazon.aws.ec2_instance:
       state: absent
       wait: true
-      name: "{{ item }-{{ enviro }}"
-
+      name: "{{ item }}-{{ enviro }}"
     loop: "{{ instances }}"
-    when:
-    - action == "destroy"
-
-   
+    when: action == "destroy"
