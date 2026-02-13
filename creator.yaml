@@ -49,8 +49,9 @@
       wait: true
     loop: "{{ ec2_output.results }}"
     when: 
+    - item.item == "frontend"
     - action == "create"
-    - item.item = "frontend"
+    
 
   - name: Delete route 53 records
     amazon.aws.route53:
