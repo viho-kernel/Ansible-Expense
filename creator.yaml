@@ -1,0 +1,29 @@
+- name: create ec2 instancs and route 53 records
+  connection: local
+  hosts: localhost
+  vars:
+    sg_id: sg-0d34a14d6eba15d9d
+    ami_id: ami-0220d79f3f480ecf5
+    action: create
+    enviro: dev
+    domain_name: opsora.space
+    instances: "{{ groups['instances'] }}"
+  tasks:
+  - name: creating ec2 instance
+    amazon.aws.ec2_instance:
+      instance_type: "t3.micro"
+      image_id: "{{ ami_id }}"
+      sg_id: "{{ sg_id }}"
+      count: 1
+      wait: true
+      name: "{{ item }}-{{ enviro }}.{domain_name}"
+      tags:
+         project: expense
+         component: "{{ item }}"
+         enviroment: "{{ enviro }}"
+         Name: "{{ item }}-{{ enviro }}"
+    register: ec2_output
+    loop: "{{ instances }}"
+        
+      
+  
