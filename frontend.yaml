@@ -44,9 +44,6 @@
     ansible.builtin.copy:
       src: frontend.conf
       dest: /etc/nginx/default.d/expense.conf
-      owner: root 
-      group: root
-      mode: '0644'
     
   - name: Restart nginx service
     ansible.builtin.service:
