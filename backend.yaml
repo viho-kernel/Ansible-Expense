@@ -63,7 +63,7 @@
   - name: start backend service
     ansible.builtin.service:
       name: backend
-      state: started
+      state: started 
       enabled: yes
   
   - name: install mysql client 
