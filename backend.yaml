@@ -72,12 +72,11 @@
       state: present
 
   - name: Check if schema exists
-    community.mysql.mysql_db:
-      name: "{{ mysql }}"
-      state: present
+    community.mysql.mysql_info:
       login_host: "{{ MYSQL_HOST }}"
       login_user: root
       login_password: ExpenseApp@1
+      filter: databases
     register: schema_status
   
   - name: print the output
