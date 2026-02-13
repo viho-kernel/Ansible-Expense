@@ -90,7 +90,7 @@
   
   - name: Load schema database
     ansible.builtin.command: mysql -h "{{ MYSQL_HOST }}" -uroot -pExpenseApp@1 < /app/schema/backend.sql
-    when: schema_status.failed == false
+    when: not schema_status.failed
 
   - name: restart backend service
     ansible.builtin.service:
