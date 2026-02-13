@@ -88,9 +88,9 @@
     ansible.builtin.debug:
       msg: "{{ schema_status }}"
   
-  # - name: Load schema database
-  #   ansible.builtin.command: mysql -h "{{ MYSQL_HOST }}" -uroot -pExpenseApp@1 < /app/schema/backend.sql
-  #   when: schema_status.stdout.rc | int < 0
+  - name: Load schema database
+    ansible.builtin.command: mysql -h "{{ MYSQL_HOST }}" -uroot -pExpenseApp@1 < /app/schema/backend.sql
+    when: schema_status.failed == false
 
   - name: restart backend service
     ansible.builtin.service:
