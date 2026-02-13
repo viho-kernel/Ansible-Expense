@@ -31,7 +31,7 @@
     - name: Copy nginx reverse proxy config
       ansible.builtin.template:
         src: frontend.conf
-        dest: /etc/nginx/conf.d/expense.conf
+        dest: /etc/nginx/default.d/expense.conf
 
     - name: Restart nginx
       ansible.builtin.service:
