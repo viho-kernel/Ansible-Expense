@@ -35,7 +35,7 @@ if [ "$CURRENT_ID" -gt "$LAST_ID" ]; then
 
   SUBJECT="New Expense Alert - Transaction ${TXN_ID}"
 
-  ./mail.sh "vihari.reddy1802@gmail.com" "$TXN_ID" "$DESCRIPTION" "$AMOUNT" "$TOTAL_EXPENSE" "$SUBJECT"
+  /home/ec2-user/Ansible-Expense/mail.sh "vihari.reddy1802@gmail.com" "$TXN_ID" "$DESCRIPTION" "$AMOUNT" "$TOTAL_EXPENSE" "$SUBJECT"
 
   echo "$CURRENT_ID" > "$LAST_ID_FILE"
 fi
