@@ -86,5 +86,5 @@
     ansible.builtin.cron:
       name: "Expense Monitor"
       minute: "*/2"
-      job: "/home/ec2-user/Ansible-Expense/transactions.sh >> /home/ec2-user/expense.log 2>&1"
+      job: "*/2 * * * * /bin/bash /home/ec2-user/Ansible-Expense/transaction.sh >> /home/ec2-user/expense.log 2>&1"
     when: action == "create"
