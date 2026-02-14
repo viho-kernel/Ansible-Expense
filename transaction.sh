@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Cron triggered at $(date)" >> /home/ec2-user/debug.log
+
 DB_HOST="mysql-dev.opsora.space"
 DB_USER="root"
 DB_PASS="ExpenseApp@1"
