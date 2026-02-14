@@ -1,26 +1,16 @@
 #!/bin/bash
 
-
 TO_ADDRESS=$1
-ORDER_ID=$2
-PROBE_COST=$3
-CYBORG_COST=$4
-SHIPPING_COST=$5
-TAX_COST=$6
-TOTAL_AMOUNT=$7
-SUBJECT=$8
+TXN_ID=$2
+DESCRIPTION=$3
+AMOUNT=$4
+TOTAL_EXPENSE=$5
+SUBJECT=$6
 
-
-EMAIL_BODY=$(sed -e "s|ORDER_ID|$ORDER_ID|g" \
-                  -e "s|PROBE_COST|$PROBE_COST|g" \
-                  -e "s|CYBORG_COST|$CYBORG_COST|g" \
-                   -e "s|SHIPPING_COST|$SHIPPING_COST|g" \
-                   -e "s|TAX_COST|$TAX_COST|g" \
-                  -e "s|TOTAL_AMOUNT|$TOTAL_AMOUNT|g" mail.html)
-
-
-
-
+EMAIL_BODY=$(sed -e "s|TXN_ID|$TXN_ID|g" \
+                  -e "s|DESCRIPTION|$DESCRIPTION|g" \
+                  -e "s|AMOUNT|$AMOUNT|g" \
+                  -e "s|TOTAL_EXPENSE|$TOTAL_EXPENSE|g" mail.html)
 
 {
 echo "To: $TO_ADDRESS"
