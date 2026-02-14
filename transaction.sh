@@ -9,7 +9,7 @@ DB_PASS="ExpenseApp@1"
 DB_NAME="transactions"
 
 # -----------------------------
-# File to store last processed ID
+# Store last processed ID
 # -----------------------------
 LAST_ID_FILE="/home/ec2-user/Ansible-Expense/last_txn_id.txt"
 
@@ -18,7 +18,6 @@ LAST_ID_FILE="/home/ec2-user/Ansible-Expense/last_txn_id.txt"
 # -----------------------------
 CURRENT_ID=$(mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -N -e "select max(id) from transactions;" 2>/dev/null)
 
-# If DB connection failed
 if [ -z "$CURRENT_ID" ]; then
   echo "Database connection failed"
   exit 1
