@@ -81,10 +81,3 @@
       name: "{{ item }}-{{ enviro }}"
     loop: "{{ instances }}"
     when: action == "destroy"
-  
-  - name: Setup cron for transaction monitor
-    ansible.builtin.cron:
-      name: "Expense Monitor"
-      minute: "*"
-      job: "/bin/bash /home/ec2-user/Ansible-Expense/transaction.sh >> /home/ec2-user/expense.log 2>&1"
-    when: action == "create"
